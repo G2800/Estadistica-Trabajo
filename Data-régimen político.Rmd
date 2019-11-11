@@ -1,0 +1,25 @@
+#limpieza
+```{r}
+library(htmltab)
+demo="https://en.wikipedia.org/wiki/Democracy_Index"
+demoPath='//*[@id="mw-content-text"]/div/table[2]/tbody'
+demo = htmltab(doc = demo,which  = demoPath,encoding = "UTF-8")
+demo[,]=lapply(demo[,], trimws,whitespace = "[\\h\\v]") # no blanks
+```
+
+```{r}
+library(stringr)
+names(demo)=str_split(names(demo)," ",simplify = T)[,1]
+names(demo)[names(demo)=="Score"]="ScoreDemo"
+demo[,c(2:7)]=lapply(demo[,c(3:8)],as.numeric)
+demo$Rank=NULL
+```
+
+```{r}
+demo=na.omit(demo)
+```
+
+```{r}
+summary(demo)
+```
+

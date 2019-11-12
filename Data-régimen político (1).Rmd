@@ -1,0 +1,57 @@
+#limpieza
+```{r}
+library(htmltab)
+demo="https://en.wikipedia.org/wiki/Democracy_Index"
+demoPath='//*[@id="mw-content-text"]/div/table[2]/tbody'
+demo = htmltab(doc = demo,which  = demoPath,encoding = "UTF-8")
+demo[,]=lapply(demo[,], trimws,whitespace = "[\\h\\v]") # no blanks
+```
+
+```{r}
+library(stringr)
+names(demo)=str_split(names(demo)," ",simplify = T)[,1]
+demo$Rank=NULL
+names(demo)[names(demo)=="Score"]="ScoreDemo"
+demo[,c(2:7)]=lapply(demo[,c(2:7)],as.numeric)
+```
+
+```{r}
+demo=na.omit(demo)
+```
+
+```{r}
+summary(demo)
+```
+```{r}
+library(cluster)
+set.seed(123)
+row.names(demo)=demo$Country
+g.dist = daisy(demo[,c(2:7)], metric="gower")
+```
+
+```{r}
+library(factoextra)
+res.pam=pam(g.dist,2,cluster.only = F)
+demo$pam=res.pam$cluster
+
+res.diana <- hcut(g.dist, k = 2,hc_func='diana')
+demo$agnes=res.diana$cluster
+
+res.agnes <- hcut(g.dist, k = 2,hc_func='agnes')
+demo$agnes=res.agnes$cluster
+```
+
+```{r}
+fviz_nbclust(demo[,c(2:7)], pam,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F) #particion
+```
+```{r}
+fviz_nbclust(demo[,c(2:7)], hcut,diss=g.dist,method = "gap_stat",k.max = 10,verbose = F) #jerarquización
+```
+```{r}
+fviz_silhouette(res.pam)
+```
+```{r}
+fviz_silhouette(res.agnes)
+```
+
+

@@ -1,0 +1,16 @@
+#limpieza
+```{r}
+library(htmltab)
+head(datas)
+```
+```{r}
+str(datas)
+```
+```{r}
+datas=datas[c(124:167,170:176),]
+```
+
+
+
+
+
